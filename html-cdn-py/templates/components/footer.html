@@ -1,0 +1,52 @@
+{# Footer Component #}
+{% macro footer() %}
+<footer class="bg-foreground text-background w-full flex flex-col">
+    <div class="container mx-auto px-4 py-8 flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-lg font-semibold mb-4">ACME</h3>
+                <p class="text-sm opacity-90">
+                    The most powerful productivity platform ever built.
+                    Transform your team's workflow with advanced collaboration tools.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/about" class="text-sm opacity-90 hover:opacity-100 transition-opacity"
+                           hx-get="/about" hx-target="#content" hx-push-url="true">
+                            About
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/client-state" class="text-sm opacity-90 hover:opacity-100 transition-opacity"
+                           hx-get="/client-state" hx-target="#content" hx-push-url="true">
+                            Client State
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/signup" class="text-sm opacity-90 hover:opacity-100 transition-opacity"
+                           hx-get="/signup" hx-target="#content" hx-push-url="true">
+                            Join Beta
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Powered By</h3>
+                <p class="text-sm opacity-90">
+                    Analytics powered by 
+                    <a href="https://getquotient.ai" target="_blank" rel="noopener noreferrer"
+                       class="underline hover:no-underline">
+                        Quotient
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="mt-8 pt-8 border-t border-background/10 text-center text-sm opacity-75">
+            © 2024 ACME. All rights reserved.
+        </div>
+    </div>
+</footer>
+{% endmacro %}

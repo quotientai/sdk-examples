@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}acme{% endblock %}</title>
+    
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    
+    <style>
+      :root {
+        font-family: Inter, sans-serif;
+        font-feature-settings: "liga" 1, "calt" 1;
+      }
+      @supports (font-variation-settings: normal) {
+        :root {
+          font-family: InterVariable, sans-serif;
+        }
+      }
+    </style>
+
+    <!-- Franken UI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@next/dist/css/core.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@next/dist/css/utilities.min.css" />
+
+    <script>
+      const htmlElement = document.documentElement;
+      const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+
+      htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+      htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+      htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+      htmlElement.classList.add(__FRANKEN__.chart || "uk-chart-default");
+    </script>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@next/dist/js/core.iife.js"></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    
+    <!-- Static Assets -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    
+    <!-- Tailwind CSS - Load after Franken UI to ensure our styles take precedence -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    
+    <!-- Connect our CSS variables to Franken UI's theme system -->
+    <style>
+      :root {
+        /* Map our colors to Franken UI's color system */
+        --uk-theme-primary: var(--primary);
+        --uk-theme-primary-foreground: var(--primary-foreground);
+        --uk-theme-secondary: var(--secondary);
+        --uk-theme-secondary-foreground: var(--secondary-foreground);
+        --uk-theme-accent: var(--accent);
+        --uk-theme-accent-foreground: var(--accent-foreground);
+        --uk-theme-muted: var(--muted);
+        --uk-theme-muted-foreground: var(--muted-foreground);
+        --uk-theme-destructive: var(--destructive);
+        --uk-theme-destructive-foreground: var(--destructive-foreground);
+      }
+    </style>
+    
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-background text-foreground">
+    <!-- Developer Tools Toast -->
+    <div id="developer-toast" class="fixed top-4 right-4 z-50 max-w-sm bg-blue-600 text-white rounded-lg shadow-lg p-4 animate-in slide-in-from-top-2 duration-300">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3 flex-1">
+                <p class="text-sm font-medium">
+                    💡 Pro Tip
+                </p>
+                <p class="text-sm mt-1 opacity-90">
+                    Open your developer tools (F12) to see outgoing analytics events in the Network tab!
+                </p>
+            </div>
+            <button
+                onclick="document.getElementById('developer-toast').style.display='none'"
+                class="ml-4 flex-shrink-0 text-white/70 hover:text-white"
+            >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-hide toast after 8 seconds
+        setTimeout(function() {
+            const toast = document.getElementById('developer-toast');
+            if (toast) {
+                toast.style.display = 'none';
+            }
+        }, 8000);
+    </script>
+    
+    {% block body %}{% endblock %}
+    
+    <script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@next/dist/js/icon.iife.js"></script>
+    
+    <!-- Quotient SDK from CDN -->
+    <script src="https://unpkg.com/@quotientjs/client@0.1.4/dist/quotient.browser.js"></script>
+    
+    <!-- Initialize Quotient Client -->
+    <script>
+        // Initialize Quotient client
+        let quotientClient = null;
+        
+        function initQuotient() {
+            if (typeof Quotient !== 'undefined' && !quotientClient) {
+                console.log("Initializing Quotient client");
+                try {
+                    // Use the synchronous init method as shown in the working example
+                    quotientClient = Quotient.QuotientClient.init({
+                        apiKey: "pk_949bfeff7de899f1b48cd2bf7563fbe4cf25be93",
+                        baseUrl: "https://staging.getquotient.ai"
+                    });
+                    
+                    // Store client globally for easy access
+                    window.quotientClient = quotientClient;
+                    
+                    // Track initial page view asynchronously
+                    quotientClient.analytics.event({
+                        eventType: "pageView",
+                    }).catch(error => console.error('Error tracking page view:', error));
+                    
+                    console.log("Quotient client initialized successfully");
+                } catch (error) {
+                    console.error('Error initializing Quotient client:', error);
+                }
+            }
+        }
+        
+        // Wait for SDK to load then initialize
+        window.addEventListener('load', () => {
+            if (typeof Quotient !== 'undefined') {
+                initQuotient();
+            } else {
+                // Poll until SDK is loaded
+                const checkInterval = setInterval(() => {
+                    if (typeof Quotient !== 'undefined') {
+                        clearInterval(checkInterval);
+                        initQuotient();
+                    }
+                }, 100);
+            }
+        });
+    </script>
+    
+    <!-- Global initialization system -->
+    <script>
+        // Create a global initialization registry
+        window.AppInit = window.AppInit || {
+            handlers: [],
+            
+            // Register a handler to be called on initialization
+            register: function(handler) {
+                this.handlers.push(handler);
+            },
+            
+            // Run all registered handlers
+            run: function() {
+                this.handlers.forEach(handler => {
+                    try {
+                        handler();
+                    } catch (e) {
+                        console.error('Error in initialization handler:', e);
+                    }
+                });
+            }
+        };
+        
+        // Run initializers on regular page load
+        document.addEventListener('DOMContentLoaded', function() {
+            window.AppInit.run();
+        });
+        
+        // Run initializers when content is loaded via HTMX
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            // Small delay to ensure DOM is ready
+            setTimeout(function() {
+                window.AppInit.run();
+            }, 10);
+        });
+        
+        // Also handle htmx:afterSettle for more complex scenarios
+        document.body.addEventListener('htmx:afterSettle', function(event) {
+            // Run any deferred initializations
+            if (window.AppInit.deferred) {
+                window.AppInit.deferred();
+            }
+            
+            // Track page view for Quotient
+            if (window.quotientClient) {
+                window.quotientClient.analytics.event({
+                    eventType: "pageView",
+                }).catch(error => console.error('Error tracking page view:', error));
+            }
+        });
+    </script>
+</body>
+</html>

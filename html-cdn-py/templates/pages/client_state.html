@@ -1,0 +1,159 @@
+<section class="py-20">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8">(Quotient Client State)</h2>
+
+            <div class="bg-card border rounded-lg p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Quotient Store API Demo</h3>
+                <p class="text-muted-foreground mb-6">
+                    This page demonstrates the Quotient client's store API, which manages device identification,
+                    session tracking, and user state.
+                </p>
+
+                <div class="grid gap-4 md:grid-cols-2 mb-6">
+                    <div class="bg-muted/50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 text-sm uppercase tracking-wide">Device ID</h4>
+                        <code id="device-id" class="text-sm bg-background px-2 py-1 rounded border block">
+                            Loading...
+                        </code>
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Unique identifier for this browser/device
+                        </p>
+                    </div>
+
+                    <div class="bg-muted/50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 text-sm uppercase tracking-wide">Session ID</h4>
+                        <code id="session-id" class="text-sm bg-background px-2 py-1 rounded border block">
+                            Loading...
+                        </code>
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Unique identifier for this browsing session
+                        </p>
+                    </div>
+
+                    <div class="bg-muted/50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 text-sm uppercase tracking-wide">Person ID</h4>
+                        <code id="person-id" class="text-sm bg-background px-2 py-1 rounded border block">
+                            Not identified
+                        </code>
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Set when a user is identified (e.g., after signup)
+                        </p>
+                    </div>
+
+                    <div class="bg-muted/50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 text-sm uppercase tracking-wide">Browser Fingerprint</h4>
+                        <code id="browser-fingerprint" class="text-sm bg-background px-2 py-1 rounded border block overflow-hidden text-ellipsis">
+                            Loading...
+                        </code>
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Browser characteristics for identification
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button
+                        onclick="refreshClientState()"
+                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4"
+                    >
+                        Refresh State
+                    </button>
+
+                    <button
+                        onclick="handleClearStorage()"
+                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4"
+                    >
+                        Clear Storage
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-semibold mb-2 text-blue-900">💡 Try This:</h4>
+                <ul class="text-sm text-blue-800 space-y-1">
+                    <li>• Sign up for the beta to see the Person ID get populated</li>
+                    <li>• Clear storage to see new IDs generated</li>
+                    <li>• Refresh the page to see session persistence</li>
+                    <li>• Open in incognito to see different device tracking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function refreshClientState() {
+    if (!window.quotientClient) {
+        console.error('Quotient client not initialized');
+        return;
+    }
+    
+    try {
+        // Get device ID
+        const deviceId = window.quotientClient.store.deviceId();
+        console.log("deviceId", deviceId);
+        document.getElementById('device-id').textContent = deviceId ? String(deviceId) : "Not available";
+        
+        // Get session ID
+        const sessionId = window.quotientClient.store.sessionId();
+        document.getElementById('session-id').textContent = sessionId ? String(sessionId) : "Not available";
+        
+        // Get browser fingerprint
+        let browserFingerprint;
+        try {
+            const bfValue = window.quotientClient.store.browserFingerprint();
+            browserFingerprint = typeof bfValue === "object"
+                ? JSON.stringify(bfValue)
+                : bfValue || "Not available";
+        } catch (err) {
+            browserFingerprint = "Not available";
+        }
+        document.getElementById('browser-fingerprint').textContent = 
+            typeof browserFingerprint === "string" ? browserFingerprint : JSON.stringify(browserFingerprint);
+        
+        // Get person ID
+        let personId;
+        try {
+            const pValue = window.quotientClient.store.personId();
+            personId = typeof pValue === "object"
+                ? JSON.stringify(pValue)
+                : pValue || null;
+        } catch (err) {
+            personId = null;
+        }
+        document.getElementById('person-id').textContent = 
+            personId === null ? "Not identified" : String(personId);
+            
+    } catch (error) {
+        console.error('Error retrieving client state:', error);
+    }
+}
+
+function handleClearStorage() {
+    if (!window.quotientClient) {
+        console.error('Quotient client not initialized');
+        return;
+    }
+    
+    try {
+        window.quotientClient.store.clear();
+        refreshClientState();
+        alert('Storage cleared successfully! The page will reload to reinitialize the client.');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error clearing storage:', error);
+        alert('Error clearing storage');
+    }
+}
+
+// Initialize state on page load
+window.AppInit.register(function() {
+    refreshClientState();
+});
+
+// Also refresh immediately if client is already available
+if (window.quotientClient) {
+    refreshClientState();
+}
+</script>

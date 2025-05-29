@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+{% from "components/footer.html" import footer %}
+
+{% block body %}
+<!-- Navigation Header -->
+<header class="flex items-stretch w-full shadow-sm">
+  <div class="flex items-center w-48">
+    <a href="/" class="flex items-center px-4 py-2 hover:bg-muted rounded-full mx-2 my-1" hx-get="/" hx-target="#content" hx-push-url="true">
+      <svg class="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="currentColor" />
+        <path d="M8 20L16 8L24 20H20L16 12L12 20H8Z" fill="white" />
+        <rect x="14" y="16" width="4" height="4" fill="white" />
+      </svg>
+      <div class="flex flex-col">
+        <span class="font-black text-xl leading-none">ACME</span>
+      </div>
+    </a>
+  </div>
+
+  <nav class="flex items-stretch flex-grow">
+    <div class="flex items-center space-x-6 ml-4">
+      <a href="/about" 
+         class="px-3 py-2 text-sm font-medium transition-colors hover:text-foreground/80 text-foreground/60"
+         hx-get="/about" hx-target="#content" hx-push-url="true">
+        About
+      </a>
+      <a href="/client-state" 
+         class="px-3 py-2 text-sm font-medium transition-colors hover:text-foreground/80 text-foreground/60"
+         hx-get="/client-state" hx-target="#content" hx-push-url="true">
+        (Quotient Client State)
+      </a>
+    </div>
+  </nav>
+  
+  <div class="flex items-stretch w-48">
+    <a href="/signup" class="bg-foreground text-background px-6 py-2 hover:opacity-90 flex items-center justify-center rounded-full mx-3 my-2 text-sm font-medium"
+       hx-get="/signup" hx-target="#content" hx-push-url="true">Join Beta →</a>
+  </div>
+</header>
+
+<!-- Main content area -->
+<main id="content" class="min-h-screen">
+    {{ content|safe }}
+</main>
+
+<!-- Footer -->
+{{ footer() }}
+{% endblock %}
